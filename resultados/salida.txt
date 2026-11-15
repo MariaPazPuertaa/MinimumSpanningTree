@@ -1,0 +1,8 @@
+costo 585282
+aristas 4
+0 3 103303
+0 4 109722
+0 1 172014
+2 4 200243
+instrucciones 153
+tiempo_ns 3000

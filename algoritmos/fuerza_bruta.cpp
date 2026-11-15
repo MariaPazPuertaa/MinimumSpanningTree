@@ -1,6 +1,5 @@
 // Arbol de minima cobertura por fuerza bruta.
 // Se prueban todos los subconjuntos de n-1 aristas y se queda el de menor costo que no tenga ciclos.
-// Uso: ./fuerza_bruta entrada.txt salida.txt
 //
 // Regla de conteo (la misma en kruskal.cpp): se suma 1 a "instrucciones" por cada
 // instrucción simple ejecutada, es decir, una línea de código simple (asignación,
