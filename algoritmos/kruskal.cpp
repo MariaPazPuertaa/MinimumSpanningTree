@@ -1,121 +1,111 @@
-// Kruskal para árbol de mínima cobertura (MST), versión eficiente O(m log m), según el pseudocódigo visto en clase.
-
-#include <bits/stdc++.h>
+// Kruskal(V, E, c) siguiendo el pseudocódigo visto en clase.
+// Uso: ./kruskal entrada.txt salida.txt
+#include <algorithm>
+#include <chrono>
+#include <cstdio>
+#include <vector>
 using namespace std;
-using namespace std::chrono;
 
 typedef long long ll;
 
-// Contador global de instrucciones simples (comparaciones, asignaciones, aritmética)
-static ll ops = 0;
+struct Arista {
+    int u, v;
+    ll costo;
+};
 
-struct Arista { int u, v; ll w; };
+ll instrucciones = 0;   // Cuenta las instrucciones simples
+vector<int> padre;      // padre[x] es el padre de x en su conjunto
 
-// Make-set: crea el conjunto unitario de v
-void crear_conjunto(vector<int>& p, vector<int>& rango, int v) {
-    p[v] = v;
-    rango[v] = 0;
-    ops += 2;
+// Compara dos aristas por costo (para ordenarlas)
+bool comparar(Arista a, Arista b) {
+    instrucciones++;
+    return a.costo < b.costo;
 }
 
-// Find-set con compresión de caminos
-int buscar_conjunto(vector<int>& p, int x) {
-    int r = x;
-    ops += 1;
-    while (p[r] != r) {
-        r = p[r];
-        ops += 3;
-    }
-    ops += 1;
-    while (p[x] != r) {
-        int sig = p[x];
-        p[x] = r;
-        x = sig;
-        ops += 4;
-    }
-    ops += 1;
-    return r;
+void make_set(int x) {
+    padre[x] = x;
+    instrucciones++;
 }
 
-// Union(u, v) por rango: une los conjuntos que contienen a u y a v
-void unir(vector<int>& p, vector<int>& rango, int u, int v) {
-    int a = buscar_conjunto(p, u);
-    int b = buscar_conjunto(p, v);
-    ops += 1;
-    if (rango[a] < rango[b]) {
-        p[a] = b;
-        ops += 1;
-    } else {
-        p[b] = a;
-        ops += 2;
-        if (rango[a] == rango[b]) {
-            rango[a]++;
-            ops += 2;
+int find_set(int x) {
+    instrucciones++;
+    if (padre[x] != x) {
+        padre[x] = find_set(padre[x]);   // Compresión de caminos
+        instrucciones++;
+    }
+    return padre[x];
+}
+
+void union_set(int u, int v) {
+    padre[find_set(u)] = find_set(v);
+    instrucciones++;
+}
+
+// Kruskal(V, E, c): n es el número de nodos y m el número de aristas
+vector<Arista> Kruskal(int n, int m, vector<Arista>& E) {
+    // sort m edges by cost and renumber them
+    sort(E.begin(), E.end(), comparar);
+
+    // T = vacío
+    vector<Arista> T;
+
+    // for each v in V: make-set(v)
+    padre.resize(n);
+    for (int v = 0; v < n; v++) {
+        make_set(v);
+    }
+
+    // for i = 1 to m
+    for (int i = 0; i < m; i++) {
+        // (u, v) = e_i
+        int u = E[i].u;
+        int v = E[i].v;
+        instrucciones++;
+        // if find-set(u) != find-set(v)
+        if (find_set(u) != find_set(v)) {
+            // T = T unión {e_i}
+            T.push_back(E[i]);
+            // union(u, v)
+            union_set(u, v);
         }
     }
+
+    // return T
+    return T;
 }
 
 int main(int argc, char** argv) {
-    if (argc < 3) {
-        fprintf(stderr, "Uso: %s entrada salida\n", argv[0]);
-        return 1;
-    }
-    FILE* fin = fopen(argv[1], "r");
-    if (!fin) { perror("entrada"); return 1; }
+    // Leer la entrada
+    FILE* entrada = fopen(argv[1], "r");
     int n, m;
-    if (fscanf(fin, "%d %d", &n, &m) != 2) return 1;
+    fscanf(entrada, "%d %d", &n, &m);
     vector<Arista> E(m);
     for (int i = 0; i < m; i++) {
-        if (fscanf(fin, "%d %d %lld", &E[i].u, &E[i].v, &E[i].w) != 3) return 1;
+        fscanf(entrada, "%d %d %lld", &E[i].u, &E[i].v, &E[i].costo);
     }
-    fclose(fin);
+    fclose(entrada);
 
-    vector<Arista> T;
-    ll costo = 0;
+    // Medir el tiempo del algoritmo
+    auto inicio = chrono::steady_clock::now();
+    vector<Arista> T = Kruskal(n, m, E);
+    auto fin = chrono::steady_clock::now();
+    ll tiempo = chrono::duration_cast<chrono::nanoseconds>(fin - inicio).count();
 
-    // Inicia la medición de tiempo
-    auto t0 = steady_clock::now();
-
-    // Ordenar aristas por costo (cada comparación del comparador cuenta como una instrucción)
-    sort(E.begin(), E.end(), [](const Arista& a, const Arista& b) {
-        ops++;
-        return a.w < b.w;
-    });
-
-    // Make-set para cada nodo
-    vector<int> p(n), rango(n);
-    for (int v = 0; v < n; v++) {
-        crear_conjunto(p, rango, v);
-        ops += 2;
+    // Costo total del árbol
+    ll total = 0;
+    for (int i = 0; i < (int)T.size(); i++) {
+        total += T[i].costo;
     }
 
-    for (int i = 0; i < m; i++) {
-        ops += 2;
-        int u = E[i].u, v = E[i].v;
-        ops += 2;
-        ops += 1;
-        if (buscar_conjunto(p, u) != buscar_conjunto(p, v)) {
-            T.push_back(E[i]);
-            costo += E[i].w;
-            ops += 2;
-            unir(p, rango, u, v);
-        }
+    // Escribir la salida
+    FILE* salida = fopen(argv[2], "w");
+    fprintf(salida, "costo %lld\n", total);
+    fprintf(salida, "aristas %d\n", (int)T.size());
+    for (int i = 0; i < (int)T.size(); i++) {
+        fprintf(salida, "%d %d %lld\n", T[i].u, T[i].v, T[i].costo);
     }
-
-    auto t1 = steady_clock::now();
-    ll ns = duration_cast<nanoseconds>(t1 - t0).count();
-
-    FILE* fout = fopen(argv[2], "w");
-    if (!fout) { perror("salida"); return 1; }
-    if ((int)T.size() != n - 1) {
-        fprintf(fout, "grafo no conexo\n");
-    } else {
-        fprintf(fout, "costo %lld\n", costo);
-        fprintf(fout, "aristas %d\n", (int)T.size());
-        for (auto& e : T) fprintf(fout, "%d %d %lld\n", e.u, e.v, e.w);
-    }
-    fprintf(fout, "instrucciones %lld\n", ops);
-    fprintf(fout, "tiempo_ns %lld\n", ns);
-    fclose(fout);
+    fprintf(salida, "instrucciones %lld\n", instrucciones);
+    fprintf(salida, "tiempo_ns %lld\n", tiempo);
+    fclose(salida);
     return 0;
 }
