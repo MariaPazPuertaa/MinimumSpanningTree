@@ -1,0 +1,8 @@
+*.exe
+algoritmos/kruskal
+algoritmos/fuerza_bruta
+generador/generador
+resultados/*.out
+informe/*.aux
+informe/*.log
+informe/*.out
