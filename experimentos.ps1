@@ -1,6 +1,6 @@
 # Compila los programas, genera las instancias y ejecuta todos los experimentos con PowerShell en Windows.
 # 
-# Uso: ./ejecutar_experimentos.ps1
+# Uso: ./experimentos.ps1
 #
 # Cada ejecución se repite varias veces: El número de instrucciones es siempre el mismo
 # y el tiempo que se guarda es la mediana de las repeticiones.
