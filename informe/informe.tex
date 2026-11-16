@@ -9,6 +9,7 @@
 \usepackage{xcolor}
 \usepackage{float}
 \usepackage[margin=2.5cm]{geometry}
+\usepackage[hidelinks]{hyperref}
 \input{constantes.tex}
 
 \lstset{
@@ -18,58 +19,62 @@
   literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1 {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
 }
 
-\title{Árbol de mínima cobertura: Kruskal frente a fuerza bruta\\\large Análisis y Diseño de Algoritmos}
-\author{María Paz Puerta Acevedo}
+\title{Árbol de mínima cobertura: Kruskal frente a fuerza bruta\\\large Diseño de Algoritmos}
+\author{María Paz Puerta Acevedo \\\large mariap.puertaa@autonoma.edu.co \\\large 1054861681 }
 \date{Martes 17 de noviembre de 2026}
 
 \begin{document}
 \maketitle
 
+\begin{center}
+Link de GitHub: \url{https://github.com/MariaPazPuertaa/MinimumSpanningTree}
+\end{center}
+
 \section{Problema elegido}
-Se eligió el problema del \emph{árbol de mínima cobertura} (MST). Dado un grafo no dirigido y conexo $G=(V,E)$ con $n$ nodos, $m$ arcos y un costo $c_e$ para cada arco, se busca un árbol de cobertura $T$ cuya suma de costos sea la menor posible.
+Para esta actividad elegí el problema del \emph{árbol de mínima cobertura}, conocido en inglés como \emph{Minimum Spanning Tree} (MST). Dado un grafo no dirigido y conexo $G=(V,E)$ con $n=|V|$ nodos y $m=|E|$ arcos, y un costo $c_e$ asociado a cada arco $e$, se busca un árbol de cobertura $T$ cuya suma de costos sea mínima. Es decir, se busca un subconjunto de arcos $T\subseteq E$ que conecte todos los nodos del grafo sin formar ciclos.
 
 \section{Algoritmos implementados}
 \subsection{Algoritmo eficiente: Kruskal}
-Se implementó el algoritmo de Kruskal visto en clase, con el mismo pseudocódigo de la diapositiva:
+Para el algoritmo eficiente implementé Kruskal, siguiendo el pseudocódigo de la diapositiva vista en clase:
 \begin{itemize}
   \item Ordenar los $m$ arcos por costo.
-  \item $T=\emptyset$ y \texttt{make-set}$(v)$ para cada nodo $v$.
-  \item Para cada arco $e_i=(u,v)$ en orden: si \texttt{find-set}$(u)\neq$ \texttt{find-set}$(v)$, agregar $e_i$ a $T$ y hacer \texttt{union}$(u,v)$.
+  \item Inicializar $T=\emptyset$ y hacer \texttt{make-set}$(v)$ para cada nodo $v$.
+  \item Para cada arco $e_i=(u,v)$ en orden: si \texttt{find-set}$(u)\neq$ \texttt{find-set}$(v)$, se agrega $e_i$ a $T$ y se hace \texttt{union}$(u,v)$.
 \end{itemize}
-Para \texttt{union-find} se usa un arreglo \texttt{padre} con compresión de caminos. El ordenamiento se hace con \texttt{sort} de C++. Como se vio en clase, Kruskal es un caso especial del algoritmo codicioso con las reglas roja y azul, y por eso produce un MST. Al final, si $T$ no tiene $n-1$ arcos, el grafo no es conexo y el programa lo avisa.
+Para \texttt{union-find} usé un arreglo \texttt{padre} con compresión de caminos, y para ordenar usé \texttt{sort} de C++. Como vimos en clase, Kruskal es un caso especial del algoritmo codicioso con las reglas roja y azul, y por eso produce un MST. Al final, si $T$ no tiene $n-1$ arcos, el grafo no es conexo y el programa lo avisa.
 
 \subsection{Fuerza bruta}
-Se prueban todos los subconjuntos de $n-1$ arcos entre los $m$ que hay. Para cada subconjunto se revisa si algún arco forma un ciclo (usando también conjuntos disjuntos). Si no hay ciclos, los $n-1$ arcos forman un árbol de cobertura, y se guarda el de menor costo. Si ningún subconjunto sirve, el grafo no es conexo.
+En la versión a fuerza bruta pruebo todos los subconjuntos de $n-1$ arcos entre los $m$ que hay. Para cada subconjunto reviso si algún arco forma un ciclo, usando también conjuntos disjuntos. En este caso, si no hay ciclos, esos $n-1$ arcos forman un árbol de cobertura, porque como vimos en clase un subgrafo acíclico con $n-1$ arcos es un árbol de cobertura, y me quedo con el de menor costo, y si ningún subconjunto sirve, el grafo no es conexo.
 
 \subsection{Entrada y salida}
-Los dos programas se ejecutan como \texttt{./programa entrada.txt salida.txt}. La entrada tiene en la primera línea \texttt{n m}, y luego $m$ líneas \texttt{u v costo} con los nodos numerados de $0$ a $n-1$. La salida tiene el costo del árbol, sus arcos, el número de instrucciones contadas (\texttt{instrucciones}) y el tiempo en nanosegundos (\texttt{tiempo\_ns}). Si el grafo no es conexo se escribe \texttt{grafo no conexo} en vez del costo y los arcos. Los programas también avisan si falta un argumento, si el archivo no existe o si el formato está mal.
+Los dos programas se ejecutan como \texttt{./programa entrada.txt salida.txt}. La entrada tiene en la primera línea \texttt{(n, m)}, y luego $m$ líneas \texttt{(u, v, costo)} con los nodos numerados de $0$ a $n-1$. La salida contiene el costo del árbol, sus arcos, el número de instrucciones contadas llamadas \texttt{instrucciones} en el código y el tiempo en nanosegundos (\texttt{tiempo\_ns}). Entonces, si el grafo no es conexo se escribe \texttt{grafo no conexo} en vez del costo y los arcos. Los programas o códigos también avisan si falta un argumento, si el archivo no existe o si el formato está mal.
 
 \section{Instrumentación}
-\paragraph{Instrucciones.} Hay una variable global \texttt{instrucciones}. En los dos programas se sigue la misma regla: se suma 1 por cada instrucción simple que se ejecuta (una asignación, una comparación, la condición de un \texttt{if}, una llamada a función). El encabezado de un \texttt{for} cuenta 1 por iteración. En el ordenamiento de Kruskal se cuenta 1 por cada comparación que hace \texttt{sort}. Es un conteo aproximado, pero siempre da el mismo valor para la misma instancia y sirve para ver cómo crece el algoritmo. Como la regla es igual en los dos programas, sus conteos se pueden comparar.
+\paragraph{Instrucciones:} Usé una variable global \texttt{instrucciones} para los dos programas o algoritmos, en este caso, apliqué la misma regla: sumo 1 por cada instrucción simple que se ejecuta, ya sea una asignación, una comparación, la condición de un \texttt{if}, una llamada a función, entre otras. En este caso, el \texttt{for} cuenta 1 por iteración. En Kruskal cuento 1 por cada comparación que hace \texttt{sort}, que es un conteo aproximado, pero siempre da el mismo valor para la misma instancia y sirve para ver cómo crece el algoritmo. Entonces, como la regla es igual en los dos programas, sus conteos se pueden comparar.
 
-\paragraph{Tiempo.} Se mide con \texttt{std::chrono::steady\_clock} desde el inicio del algoritmo (después de leer el archivo) hasta su final (antes de escribir el resultado). Como una sola medición puede variar, cada instancia se ejecuta varias veces (entre 3 y 15) y se reporta la mediana.
+\paragraph{Tiempo:} Lo medí con \texttt{std::chrono::steady\_clock} desde el inicio del algoritmo (después de leer el archivo) hasta su final (antes de escribir el resultado). Como una sola medición puede variar, ejecuté cada instancia varias veces (entre 3 y 15) y reporto la mediana.
 
 \section{Generador de instancias}
-El programa \texttt{generador} recibe $n$, $m$, una semilla y el nombre del archivo. Primero crea un árbol al azar (cada nodo $v$ se une con un nodo anterior elegido al azar), así el grafo siempre es conexo. Después agrega arcos distintos al azar hasta tener $m$. Los costos son enteros al azar entre $1$ y $10^6$. Con la misma semilla se obtiene siempre la misma instancia.
+Escribí un programa \texttt{generador.cpp} que recibe $n$, $m$, una semilla y el nombre del archivo. Primero crea un árbol al azar (cada nodo $v$ se une con un nodo anterior elegido al azar), así el grafo siempre es conexo. Después agrega arcos distintos al azar hasta llegar a $m$, donde los costos son enteros al azar entre $1$ y $10^6$. Con la misma semilla se obtiene siempre la misma instancia, lo que permite repetir los experimentos.
 
 \section{Experimentos}
-La fuerza bruta es muy lenta para tamaños grandes, así que se usaron dos tipos de instancias:
+Como la fuerza bruta es muy lenta para tamaños grandes, usé dos tipos de instancias:
 \begin{itemize}
   \item Grafos completos con $n=4,\dots,10$ (es decir, $m=n(n-1)/2$), con los dos algoritmos.
   \item Grafos con $m=3n$ y $n$ desde $10^3$ hasta $10^6$, solo con Kruskal.
 \end{itemize}
-En todas las instancias donde se ejecutaron los dos algoritmos el costo del MST fue el mismo. Además, el script \texttt{verificar.sh} compara los dos algoritmos en 200 instancias pequeñas al azar y no encontró ninguna diferencia.
+En todas las instancias donde ejecuté los dos algoritmos, el costo del MST fue el mismo. Además, escribí el script \texttt{verificar.sh}, que compara los dos algoritmos en 200 instancias pequeñas al azar y no encontró ninguna diferencia.
 
 \begin{table}[H]
 \centering
 \input{tabla_bruta.tex}
-\caption{Fuerza bruta en grafos completos. La última columna son las instrucciones de Kruskal en la misma instancia.}
+\caption{Fuerza bruta en grafos completos, donde la última columna son las instrucciones de Kruskal en la misma instancia.}
 \end{table}
 
 \begin{table}[H]
 \centering
 \input{tabla_kruskal.tex}
-\caption{Kruskal en grafos con $m=3n$.}
+\caption{Algoritmo de Kruskal en grafos con $m=3n$.}
 \end{table}
 
 \section{Análisis teórico}
@@ -77,22 +82,22 @@ En todas las instancias donde se ejecutaron los dos algoritmos el costo del MST 
 \begin{itemize}
   \item Ordenar los $m$ arcos cuesta $O(m\log m)$.
   \item Hacer \texttt{make-set} para los $n$ nodos cuesta $O(n)$.
-  \item El ciclo hace $m$ iteraciones, y en cada una hay dos \texttt{find-set} y a lo sumo una \texttt{union}. Con \texttt{union-find} cada operación cuesta $O(\log n)$, y como el grafo es conexo $n-1\le m$, así que esto es $O(\log m)$. El ciclo cuesta entonces $O(m\log m)$.
+  \item El ciclo hace $m$ iteraciones, y en cada una hay dos \texttt{find-set} y a lo sumo una \texttt{union}. Con \texttt{union-find} cada operación cuesta $O(\log n)$ de forma amortizada, y como el grafo es conexo $n-1\le m$, así que esto es $O(\log m)$. El ciclo cuesta entonces $O(m\log m)$.
 \end{itemize}
-En total Kruskal es $O(m\log m)$, igual que en la diapositiva. Esta es la función de menor crecimiento posible para este algoritmo, porque ordenar por comparaciones ya necesita al menos del orden de $m\log m$ pasos. Entonces
+En total Kruskal es $O(m\log m)$, igual que en las diapositivas vistas en clase. Esta cota es ajustada, porque ordenar por comparaciones ya requiere $\Omega(m\log m)$ pasos. Por eso la función de menor crecimiento para la que Kruskal es $O$ es:
 \[
 f_K(m)=m\log m .
 \]
 
 \subsection{Fuerza bruta}
-Se revisan $\binom{m}{n-1}$ subconjuntos, y cada revisión cuesta $O(n)$ (reiniciar los conjuntos y recorrer a lo sumo $n-1$ arcos). Además, las llamadas de la recursión no pasan de $n\binom{m}{n-1}$. Por eso
+Mi implementación revisa siempre los $\binom{m}{n-1}$ subconjuntos, porque necesita recorrerlos todos para asegurar que encontró el de menor costo. Cada revisión cuesta $\Theta(n)$, ya que hay que reiniciar los conjuntos y recorrer a lo sumo $n-1$ arcos. Además, las llamadas de la recursión no pasan de $n\binom{m}{n-1}$. Por eso el algoritmo es $\Theta\!\left(n\binom{m}{n-1}\right)$, y la función de menor crecimiento es
 \[
 f_B(n,m)=n\binom{m}{n-1}.
 \]
-En un grafo completo $m=n(n-1)/2$ y $\binom{m}{n-1}\ge\left(\frac{m}{n-1}\right)^{n-1}=\left(\frac{n}{2}\right)^{n-1}$, por lo que el costo crece más rápido que cualquier función exponencial $c^n$.
+En un grafo completo $m=n(n-1)/2$ y $\binom{m}{n-1}\ge\left(\frac{m}{n-1}\right)^{n-1}=\left(\frac{n}{2}\right)^{n-1}$, por lo que el costo crece más rápido que cualquier función exponencial $c^n$. Por el teorema de Cayley visto en clase, un grafo completo de $n$ nodos tiene $n^{n-2}$ árboles de cobertura. Mi algoritmo no enumera árboles sino subconjuntos de $n-1$ arcos, que son $\binom{m}{n-1}$ y incluyen a todos esos árboles, por eso uso esta cuenta en $f_B$.
 
 \section{Comparación con los datos}
-Para cada algoritmo se buscó una constante $C$ tal que la gráfica de $C\,f(n)$ quede lo más cerca posible de los datos. Se calculó el cociente $\text{dato}/f$ para cada tamaño y se tomó la mediana de esos cocientes. Para el tiempo no se usaron las ejecuciones menores a 1\,ms, porque son tan cortas que casi solo miden ruido; aun así aparecen en las gráficas.
+Para cada algoritmo busqué una constante $C$ tal que la gráfica de $C\,f(n)$ quede lo más cerca posible de los datos. Calculé el cociente $\text{dato}/f$ para cada tamaño y tomé la mediana de esos cocientes. Para el tiempo no usé las ejecuciones menores a 1\,ms, porque son tan cortas que el error de medición es comparable al tiempo del algoritmo; aun así aparecen en las gráficas.
 \begin{center}
 \begin{tabular}{lcc}
 \toprule
@@ -108,7 +113,7 @@ Fuerza bruta, $f_B=n\binom{m}{n-1}$ & \cOpsB & \cTB\\
 \centering
 \includegraphics[width=0.48\textwidth]{../graficas/kruskal_ops.pdf}
 \includegraphics[width=0.48\textwidth]{../graficas/kruskal_tiempo.pdf}
-\caption{Kruskal: datos y la curva $C\,m\log_2 m$ (ejes logarítmicos).}
+\caption{Algoritmo de Kruskal: datos y la curva $C\,m\log_2 m$ (ejes logarítmicos).}
 \end{figure}
 
 \begin{figure}[H]
@@ -118,12 +123,50 @@ Fuerza bruta, $f_B=n\binom{m}{n-1}$ & \cOpsB & \cTB\\
 \caption{Fuerza bruta: datos y la curva $C\,n\binom{m}{n-1}$ (eje vertical logarítmico).}
 \end{figure}
 
+\paragraph{Algoritmo de Kruskal:}
 En las gráficas de Kruskal los datos siguen de cerca la curva $C\,m\log_2 m$: la mayor diferencia entre los datos y la curva es de \errOpsK\,\% en instrucciones y de \errTK\,\% en tiempo. Esto confirma que Kruskal se comporta como $m\log m$.
 
+\paragraph{Fuerza bruta:}
 En la fuerza bruta las instrucciones también siguen la curva $C\,n\binom{m}{n-1}$, con una diferencia máxima de \errOpsB\,\%. El tiempo se parece a la curva, pero no tanto: con las ejecuciones de más de 1\,ms ($n\ge 7$) la diferencia máxima es de \errTB\,\%. Para $n$ pequeño las ejecuciones duran microsegundos y el tiempo medido casi no depende del algoritmo, por eso esos puntos se separan de la curva en la gráfica.
 
 \section{Conclusiones}
-Kruskal resuelve en \tKruskalMax{} segundos una instancia con \nKruskalMax{} nodos y \mKruskalMax{} arcos. La fuerza bruta, en cambio, ya tarda cerca de \tBrutaDiez{} segundos con solo 10 nodos, y su tiempo se multiplica por cerca de \factorNueveDiez{} al pasar de 9 a 10 nodos. Esto muestra la diferencia entre un algoritmo que crece casi como $m\log m$ y uno que revisa todos los subconjuntos de arcos.
+\begin{enumerate}
+  \item El algoritmo de Kruskal resuelve en \tKruskalMax{} segundos una instancia con \nKruskalMax{} nodos y \mKruskalMax{} arcos, mientras que la fuerza bruta ya tarda cerca de \tBrutaDiez{} segundos con 10 nodos, y no fue posible probarla con más.
+
+  \item Los dos algoritmos dieron el mismo costo de MST en todas las instancias donde se ejecutaron, y \texttt{verificar.sh} no encontró diferencias en 200 instancias pequeñas al azar.
+  
+  \item El algoritmo de Kruskal es un caso especial del algoritmo codicioso con las reglas roja y azul, y por eso produce un MST. Al elegir siempre el arco más barato que no forma un ciclo, nunca tiene que revisar los $\binom{m}{n-1}$ subconjuntos de arcos como hace la fuerza bruta.
+  
+  \item Las curvas teóricas $C\,m\log_2 m$ y $C\,n\binom{m}{n-1}$ se ajustaron bien a los datos, sobre todo en el conteo de instrucciones. Esto confirma que el análisis teórico describe cómo crece cada algoritmo.
+\end{enumerate}
+
+\section{Declaración de uso de inteligencia artificial}
+Este informe se elaboró con apoyo de Claude (Anthropic), un asistente de inteligencia artificial. Definí el problema, los programas y los experimentos, y revisé, corregí y aprobé el resultado final.
+
+\paragraph{Para qué se usó.}
+\begin{itemize}
+  \item Revisar la estructura y la redacción del informe frente a lo que pide el enunciado.
+  \item Sugerir correcciones al texto: definir $n$ y $m$ en la sección 1, indicar que el costo de \texttt{union-find} es amortizado, justificar la cota ajustada con $\Omega(m\log m)$ y justificar que la fuerza bruta es $\Theta\!\left(n\binom{m}{n-1}\right)$.
+  \item Redactar partes del texto y proponer posibles conclusiones.
+  \item Relacionar el informe con las diapositivas de clase (teorema de Cayley y equivalencias de un árbol de cobertura).
+  \item Explicar conceptos como cota superior, inferior y ajustada, y el error de medición del tiempo, y ayudar a entender advertencias de compilación de LaTeX.
+  \item Ayudar con la redacción de la documentación en los códigos, sin cambiar su lógica.
+\end{itemize}
+
+\paragraph{Qué hice yo.}
+\begin{itemize}
+  \item Elegí el problema del árbol de mínima cobertura y los experimentos que se debían hacer.
+  \item Implementé Kruskal y la fuerza bruta, la instrumentación de instrucciones y tiempo, el generador de instancias y los scripts.
+  \item Ejecuté los experimentos y obtuve los datos, las tablas, las constantes y las gráficas.
+  \item Revisé cada sección del informe y corregí lo que no correspondía a mi trabajo.
+  \item Redacté las conclusiones de acuerdo a lo que me explicaba y entendía de Claude.
+  \item Verifiqué que lo que afirmo en el texto coincide con mis resultados.
+\end{itemize}
+
+\paragraph{Responsabilidad.} El contenido de este informe es responsabilidad mía.
+
+\medskip
+\noindent\textit{Herramienta: Claude, de Anthropic. Noviembre de 2026.}
 
 \appendix
 \section{Código fuente}
@@ -136,7 +179,7 @@ Kruskal resuelve en \tKruskalMax{} segundos una instancia con \nKruskalMax{} nod
 \subsection{experimentos.sh}
 \lstinputlisting[language=bash]{../experimentos.sh}
 \subsection{experimentos.ps1}
-\lstinputlisting{../experimentos.ps1}
+\lstinputlisting[language={}]{../experimentos.ps1}
 \subsection{verificar.sh}
 \lstinputlisting[language=bash]{../verificar.sh}
 \subsection{analisis.py}
