@@ -124,7 +124,7 @@ Fuerza bruta, $f_B=n\binom{m}{n-1}$ & \cOpsB & \cTB\\
 \end{figure}
 
 \paragraph{Algoritmo de Kruskal:}
-En las gráficas de Kruskal los datos siguen de cerca la curva $C\,m\log_2 m$: la mayor diferencia entre los datos y la curva es de \errOpsK\,\% en instrucciones y de \errTK\,\% en tiempo. Esto confirma que Kruskal se comporta como $m\log m$.
+En las gráficas de Kruskal las instrucciones siguen de cerca la curva $C\,m\log_2 m$: La mayor diferencia entre los datos y la curva es de \errOpsK\,\% en instrucciones. En tiempo la diferencia máxima es de \errTK\,\%, porque el tiempo depende también del computador. Esto indica que Kruskal se comporta aproximadamente como $m\log m$.
 
 \paragraph{Fuerza bruta:}
 En la fuerza bruta las instrucciones también siguen la curva $C\,n\binom{m}{n-1}$, con una diferencia máxima de \errOpsB\,\%. El tiempo se parece a la curva, pero no tanto: con las ejecuciones de más de 1\,ms ($n\ge 7$) la diferencia máxima es de \errTB\,\%. Para $n$ pequeño las ejecuciones duran microsegundos y el tiempo medido casi no depende del algoritmo, por eso esos puntos se separan de la curva en la gráfica.
