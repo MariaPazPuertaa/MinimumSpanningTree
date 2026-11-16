@@ -29,7 +29,7 @@ using namespace std;
 // no se desborde.
 typedef long long ll;
 
-// Es un arco del grafo: Que une los nodos u y v y tiene un costo.
+// Es una arista del grafo: Que une los nodos u y v y tiene un costo.
 // Por ejemplo, la línea "0 3 148568" de la entrada es u = 0, v = 3 y
 // costo = 148568.
 struct Arista {
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // Leer la entrada: Primero n y m, y luego los m arcos
+    // Leer la entrada: Primero n y m, y luego las m aristas.
     FILE* entrada = fopen(argv[1], "r");
     if (!entrada) {
         printf("No se pudo abrir el archivo de entrada: %s\n", argv[1]);
